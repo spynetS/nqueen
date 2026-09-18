@@ -73,26 +73,27 @@ def crossover(parents: list) -> list:
     return child
 
 # ===== main program =====
-n = 20
-pop_len = 20
-population = populate(n,pop_len)
-# for state in population:
-#     print_state(state)
-
-found = False
-# play it out over generations
-generations = 10000
-for i in range(generations):
-    parents = selection(population, 2)
-    population = []
-    for j in range(pop_len):
-        child = crossover(parents)
-        population.append(child)
-        if fitness(child) == 0:
-            print("after",i, "generations")
-            print(child)
-            print_state(child)
-            found = True
+def nqueen(n: int, pop_len: int):
+    population = populate(n,pop_len)
+    # for state in population:
+    #     print_state(state)
+    
+    found = False
+    # play it out over generations
+    generations = 10000
+    for i in range(generations):
+        parents = selection(population, 2)
+        population = []
+        for j in range(pop_len):
+            child = crossover(parents)
+            population.append(child)
+            if fitness(child) == 0:
+                print("after",i, "generations")
+                print(child)
+                print_state(child)
+                found = True
+                break
+        if found:
             break
-    if found:
-        break
+
+nqueen(10,10)

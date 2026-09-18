@@ -1,14 +1,5 @@
 import random
 
-
-def random_state(n: int):
-    state = []
-    for i in range(n):
-        state.append(random.randint(0,n))
-    return state
-
-
-
 def print_state(state):
     n = len(state)
     print("Fitness:", fitness(state))
@@ -31,55 +22,77 @@ def print_state(state):
         print(x, end=" ")
     print("")
 
+
+def random_state(n: int):
+    state = list(range(n))
+    random.shuffle(state)
+    return state
+
 def populate(n: int):
     population = []
-    for i in range(n):
+    for i in range(n*2):
         population.append(random_state(n))
 
     return population
 
-def sum_diag(state):
+def fitness(state):
+    # Here we sum the number of queens on the same diagonal
     n = len(state)
     diag_sum = 0
     for i in range(0,n):
         col = state[i]
         # here we check all the squares
         # diagonaly to our cell
-        for j in range(i+1,n-1):
+        for j in range(i+1,n):
             # if the row above us 
             if abs(state[j] - state[i]) == abs(j - i):
                 diag_sum += 1
-                print("fail at index", (i, j),"val", (state[i], state[j]), "becase", state[j], "==", state[i]+j)
     return diag_sum
 
-def fitness(state):
-    # Here we sum the number of queens on the same rows
-    # if the sum is 0 we have a solution
-    fail_at = []
-    seen = set()
-    row_sum = 0
-    for i in range(len(state)):
-        col = state[i]
-        if col in seen:
-            row_sum += 1
-            print("fail at", (i, col))
-        else: seen.add(col)
-    return row_sum+sum_diag(state)
+def selection(population: list, amnt: int) -> list:
+    population.sort(key=fitness)
+    return population[:amnt]
+    
+def crossover(parents: list) -> list:
+    # here we combine 2 parents into one child
+    # we take one half and fill in the rest
+    # from the other parent
+    n = len(parents[0])
+    half = (n+1) // 2
 
-#  TODO remove me (unnacecery)
-def test_fitness():
-    state = [0,6,3,5,7,1,4,2]
-    print_state(state)
-    fit = fitness(state)
-    if fit == 0: print("pass")
-    else: print("fail")
+    child = parents[0][:half]
+    for v in parents[1]:
+        if v not in child:
+            child.append(v)
 
+    mutation_rate = 0.05
+    if random.random() < mutation_rate:
+        i, j = random.sample(range(len(child)), 2)
+        child[i], child[j] = child[j], child[i]
+
+    return child
 
 # ===== main program =====
-population = populate(8)
-for state in population:
-    print_state(state)
+n = 8
+pop_len = n*2
+population = populate(n)
+# for state in population:
+#     print_state(state)
 
-    
-
-#test_fitness()
+found = False
+# play it out over generations
+generations = 10000
+for i in range(generations):
+    parents = selection(population, 2)
+    population = []
+    for j in range(pop_len):
+        child = crossover(parents)
+        population.append(child)
+        if fitness(child) == 0:
+            print("after",i, "generations")
+            print(child)
+            print_state(child)
+            found = True
+            break
+    if found:
+        break

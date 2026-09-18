@@ -36,6 +36,7 @@ def populate(n: int, pop_len: int):
     return population
 
 def fitness(state):
+    # FIXME BUG This only checks the diagonal over us not under
     # Here we sum the number of queens on the same diagonal
     n = len(state)
     diag_sum = 0
@@ -96,4 +97,7 @@ def nqueen(n: int, pop_len: int):
         if found:
             break
 
-nqueen(10,10)
+#nqueen(8,10)
+state = random_state(8)
+print_state(state)
+

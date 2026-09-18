@@ -28,9 +28,9 @@ def random_state(n: int):
     random.shuffle(state)
     return state
 
-def populate(n: int):
+def populate(n: int, pop_len: int):
     population = []
-    for i in range(n*2):
+    for i in range(pop_len):
         population.append(random_state(n))
 
     return population
@@ -73,9 +73,9 @@ def crossover(parents: list) -> list:
     return child
 
 # ===== main program =====
-n = 8
-pop_len = n*2
-population = populate(n)
+n = 20
+pop_len = 20
+population = populate(n,pop_len)
 # for state in population:
 #     print_state(state)
 

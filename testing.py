@@ -1,6 +1,8 @@
 import nqueen
 import math
 import matplotlib.pyplot as plt
+from concurrent.futures import ThreadPoolExecutor
+
 
 class Config:
     def __init__(self, n: int, pop_len: int, parents: int,  mutation_rate:float):
@@ -13,26 +15,29 @@ class Config:
 
 def get_average(config: Config, rounds: int = 10, verbose: bool = False):
     """ Runs the algorithm rounds times and calculates the averate and returns it """
+    if verbose: print("N = ", config.n)
     sum_ = 0
     for i in range(rounds):
         generations, state = nqueen.nqueen(config.n, config.pop_len, config.parents, config.mutation_rate)
+        # nqueen.print_state(state)
         sum_ += generations
         if verbose: print(i,"/",rounds,"->", generations)
     return sum_/rounds
 
 if __name__ == "__main__":
-    x = []
-    y = []
-    for i in range(4,9):
-        x.append(i)
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        start = 4
+        end = 12
+        futures = [
+            executor.submit(get_average, Config(i, i*7, math.ceil(i*1.5), 0.05), 50, True)
+            for i in range(start,end)
+        ]
         
-        average = get_average(Config(i, i*7, math.ceil(i*1.5), 0.05), 100, True)
-        y.append(average)
-        print("n =",i)
-        print("average:", average)
+        results = [future.result() for future in futures]
 
-    plt.plot(x, y)
-    plt.xlabel("N")
-    plt.ylabel("Average generations")
-    plt.title("N-Queens Evolution")
-    plt.show()
+        x = range(start, end)
+        plt.plot(x, results)
+        plt.xlabel("N")
+        plt.ylabel("Average generations")
+        plt.title("N-Queens Evolution")
+        plt.show()

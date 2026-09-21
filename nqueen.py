@@ -54,7 +54,7 @@ def selection(population: list, amnt: int) -> list:
     population.sort(key=fitness)
     return population[:amnt]
     
-def crossover(parents: list) -> list:
+def crossover(parents: list, mutation_rate: int = 0.05) -> list:
     # here we combine 2 parents into one child
     # we take one half and fill in the rest
     # from the other parent
@@ -66,7 +66,6 @@ def crossover(parents: list) -> list:
         if v not in child:
             child.append(v)
 
-    mutation_rate = 0.05
     if random.random() < mutation_rate:
         i, j = random.sample(range(len(child)), 2)
         child[i], child[j] = child[j], child[i]
@@ -74,30 +73,31 @@ def crossover(parents: list) -> list:
     return child
 
 # ===== main program =====
-def nqueen(n: int, pop_len: int):
+def nqueen(n: int,
+           pop_len: int,
+           amnt_parents: int = 2,
+           mutation_rate: int = 0.05) -> int:
+    # solutions only exists for n >= 4
+    assert(n >= 4)
+    # to be able to select amnt_parents, population needs to be bigger
+    assert(pop_len >= amnt_parents)
     population = populate(n,pop_len)
-    # for state in population:
-    #     print_state(state)
-    
     found = False
     # play it out over generations
     generations = 10000
     for i in range(generations):
-        parents = selection(population, 2)
+        parents = selection(population, amnt_parents)
         population = []
         for j in range(pop_len):
-            child = crossover(parents)
+            child = crossover(parents, mutation_rate)
             population.append(child)
             if fitness(child) == 0:
-                print("after",i, "generations")
-                print(child)
-                print_state(child)
                 found = True
                 break
         if found:
-            break
+            return (i, child)
+    return (-1, {})
 
-#nqueen(8,10)
-state = random_state(8)
-print_state(state)
+if __name__ == "__main__":
+    nqueen(8,10)
 

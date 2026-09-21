@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define THREADS 8
+#define THREADS 12
 
 typedef struct {
   int rounds;
@@ -53,9 +53,9 @@ int main() {
   srand(time(NULL));
 
   size_t work_start = 4;
-  size_t work_end = 16;
-  size_t work_size = work_end - work_start;
+  size_t work_end = 20;
 
+  size_t work_size = work_end - work_start;
 
   pthread_t threads[THREADS];
   Arg args[THREADS];
@@ -73,12 +73,13 @@ int main() {
     };
     pthread_create(&threads[i], NULL, worker, &args[i]);
 
-
   }
   for (int  i = 0; i < THREADS; i ++ ){
     pthread_join(threads[i], NULL);
   }
-  FILE* file = fopen("results.txt", "w");
+
+  // handling output
+  FILE* file = fopen("data.txt", "w");
   if (file == NULL) {
     exit(1);
   }
@@ -88,8 +89,9 @@ int main() {
   }
 
   fclose(file);
-
+  #ifdef __unix__
+  printf("generated plot ./plot.png\n");
   system("gnuplot -e 'set terminal png; set output \"plot.png\"; plot \"data.txt\" using 1:2 with lines'");
-
+  #endif
   return 0;
 }

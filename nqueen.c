@@ -87,11 +87,13 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
   child.size = n;
   // copy the first half
 
+  // too keep track of used values
   bool used[n];
   for (int i = 0; i < n; i ++){
     used[i] = false;
   }
 
+  // copy the first half from parent 1x
   int pos = 0;
   for (int i = 0; i < n/2; i ++) {
     child.pos[i] = parent1.pos[i];
@@ -99,6 +101,7 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
     pos += 1;
   }
 
+  // fill in the rest from parent 2
   for (int i = 0; i < n; i ++) {
     int value = parent2.pos[i];
     if(used[value] != true) {
@@ -106,7 +109,7 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
       pos += 1;
     }
   }
-
+  // mutate if needed
   float ran = (float)rand() / (float)RAND_MAX;
   if (ran < mutation_rate) {
     int i = rand() % child.size;
@@ -127,9 +130,12 @@ int nqueen(Config config) {
   assert(config.pop_len >= config.amnt_parents);
   assert(config.n >= 4);
   assert(config.amnt_parents >= 2);
+
+  
   Chromosome* population = malloc(sizeof(Chromosome)*config.pop_len);
   populate(config.n, population, config.pop_len);
 
+  // as default it is the max generations
   int sum = MAX_GENERATIONS;
 
   for (int i = 0; i < MAX_GENERATIONS; i ++) {
@@ -143,7 +149,6 @@ int nqueen(Config config) {
       free(population[j].pos);
       population[j] = child;
       if (fitness(child) == 0) {
-        //print_chromosome(child);
         sum = i;
         goto DONE;
       }
@@ -154,6 +159,7 @@ int nqueen(Config config) {
     free(parents);
   }
 
+ // free the population and return the sum
  DONE:
   for (int j = 0; j < config.pop_len; j ++ ) {
       free(population[j].pos);

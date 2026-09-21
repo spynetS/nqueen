@@ -1,0 +1,22 @@
+The nqueen evolutionary algorithm is implemented in the [[file:nqueen.c][nqueen.c]] file.
+The nqueen function iside the file is the entry point of the algorithm.
+It takes config struct which contains the attributes controlling the algorithm.
+The config struct is defined in [[file:nqueen.h][nqueen.h]].
+
+The [[file:testing.c][testing.c]] is a testing script that runs the algorithm x number of times (defined
+int the file) in y rounds (also defined in the file) on different amount of Ns and calculcates the average
+generations. If GNUPLOT is installed the testing program will generate an plot of the n in x-axis and
+the average in y-axis.
+
+To compile
+#+begin_src bash
+make
+#+end_src
+
+To run
+#+begin_src bash
+make run
+#+end_src
+
+
+

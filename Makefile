@@ -6,7 +6,7 @@ nqueen: nqueen.c testing.c check-gnuplot
 
 check-gnuplot:
 	@command -v gnuplot >/dev/null || \
-		(echo "Error: gnuplot is not installed"; exit 1)
+		(echo "Error: gnuplot is not installed")
 
 run: nqueen
 	./nqueen

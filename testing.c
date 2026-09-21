@@ -13,6 +13,13 @@ typedef struct {
   int *results;
 } Arg;
 
+typedef struct {
+  int generations;
+  int average;
+  float success_rate;
+
+} Result;
+
 int get_avarage(Config config, int rounds) {
   int sum = 0;
 
@@ -39,13 +46,14 @@ void *worker(void *arg_) {
     printf("n = %d : %d\n", i, a);
     (arg->results)[i] = a;
   }
+  return 0;
 }
 
 int main() {
   srand(time(NULL));
 
   size_t work_start = 4;
-  size_t work_end = 12;
+  size_t work_end = 16;
   size_t work_size = work_end - work_start;
 
 
@@ -58,7 +66,7 @@ int main() {
     size_t end   = work_start + (i + 1) * work_size / THREADS;
     
     args[i] = (Arg){
-      100,
+      5,
       start,
       end,
       results,
@@ -70,20 +78,18 @@ int main() {
   for (int  i = 0; i < THREADS; i ++ ){
     pthread_join(threads[i], NULL);
   }
-    
-  for (int  i = work_start; i < work_end; i ++ ){
-    printf("average: %d %d\n",i ,results[i]);
+  FILE* file = fopen("results.txt", "w");
+  if (file == NULL) {
+    exit(1);
   }
-  
-  /* for (int  i = 4; i < 12; i ++ ){ */
-  /*   Config config = {0}; */
-  /*   config.n = i; */
-  /*   config.pop_len = i*7; */
-  /*   config.amnt_parents = (int) (i*15)/10; */
-  /*   config.mutation_rate = 0.05f; */
-  /*   printf("%d: %d\n",i, get_avarage(config, 50)); */
-  /* } */
 
+  for (int i = work_start; i < work_end; i++) {
+    fprintf(file, "%d %d\n",i, results[i]);
+  }
+
+  fclose(file);
+
+  system("gnuplot -e 'set terminal png; set output \"plot.png\"; plot \"data.txt\" using 1:2 with lines'");
 
   return 0;
 }

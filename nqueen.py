@@ -100,5 +100,10 @@ def nqueen(n: int,
     return (generations, [])
 
 if __name__ == "__main__":
-    nqueen(8,10)
+    # sum_ = 0;
+    # for i in range(1000):
+    #     gen,state = nqueen(8,10)
+    #     sum_ += gen
+    # print("average", sum_)
+    print_state([7,5,7,0,6,0,7,7])
 

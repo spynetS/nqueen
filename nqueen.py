@@ -50,11 +50,11 @@ def fitness(state):
                 diag_sum += 1
     return diag_sum
 
-def selection(population: list, amnt: int) -> list:
+def selection(population: list, amnt: int) -> list[float]:
     population.sort(key=fitness)
     return population[:amnt]
     
-def crossover(parents: list, mutation_rate: int = 0.05) -> list:
+def crossover(parents: list, mutation_rate: float = 0.05) -> list[float]:
     # here we combine 2 parents into one child
     # we take one half and fill in the rest
     # from the other parent
@@ -76,7 +76,7 @@ def crossover(parents: list, mutation_rate: int = 0.05) -> list:
 def nqueen(n: int,
            pop_len: int,
            amnt_parents: int = 2,
-           mutation_rate: int = 0.05) -> int:
+           mutation_rate: float = 0.05) -> tuple[int, list[float]]:
     # solutions only exists for n >= 4
     assert(n >= 4)
     # to be able to select amnt_parents, population needs to be bigger
@@ -88,6 +88,7 @@ def nqueen(n: int,
     for i in range(generations):
         parents = selection(population, amnt_parents)
         population = []
+        child = []
         for j in range(pop_len):
             child = crossover(parents, mutation_rate)
             population.append(child)
@@ -96,7 +97,7 @@ def nqueen(n: int,
                 break
         if found:
             return (i, child)
-    return (generations, {})
+    return (generations, [])
 
 if __name__ == "__main__":
     nqueen(8,10)

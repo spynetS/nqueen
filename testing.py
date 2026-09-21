@@ -23,10 +23,10 @@ def get_average(config: Config, rounds: int = 10, verbose: bool = False):
 if __name__ == "__main__":
     x = []
     y = []
-    for i in range(4,12):
+    for i in range(4,9):
         x.append(i)
         
-        average = get_average(Config(i, i*7, math.ceil(i*1.5), 0.05), 200)
+        average = get_average(Config(i, i*7, math.ceil(i*1.5), 0.05), 100, True)
         y.append(average)
         print("n =",i)
         print("average:", average)

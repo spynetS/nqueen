@@ -96,7 +96,7 @@ def nqueen(n: int,
                 break
         if found:
             return (i, child)
-    return (-1, {})
+    return (generations, {})
 
 if __name__ == "__main__":
     nqueen(8,10)

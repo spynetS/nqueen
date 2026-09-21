@@ -2,7 +2,7 @@ CC = gcc -Wall -pedantic
 
 
 nqueen: nqueen.c testing.c check-gnuplot
-	$(CC) nqueen.c testing.c -o nqueen
+	$(CC) -DTHREADS=$(shell nproc) nqueen.c testing.c -o nqueen
 
 check-gnuplot:
 	@command -v gnuplot >/dev/null || \

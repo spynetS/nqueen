@@ -5,6 +5,9 @@
 #include <pthread.h>
 
 #define THREADS 12
+#define ROUNDS 100
+#define START_N 4
+#define END_N 20
 
 typedef struct {
   int rounds;
@@ -52,8 +55,8 @@ void *worker(void *arg_) {
 int main() {
   srand(time(NULL));
 
-  size_t work_start = 4;
-  size_t work_end = 20;
+  size_t work_start = START_N;
+  size_t work_end = END_N;
 
   size_t work_size = work_end - work_start;
 
@@ -66,7 +69,7 @@ int main() {
     size_t end   = work_start + (i + 1) * work_size / THREADS;
     
     args[i] = (Arg){
-      5,
+      ROUNDS,
       start,
       end,
       results,

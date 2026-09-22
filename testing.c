@@ -5,10 +5,10 @@
 #include <pthread.h>
 
 #ifndef THREADS
-#define THREADS 12
+#define THREADS 2
 #endif
 #ifndef ROUNDS
-#define ROUNDS 200
+#define ROUNDS 50
 #endif
 #ifndef START_N
 #define START_N 4
@@ -35,7 +35,6 @@ typedef struct {
 int compare_int(const void *a, const void *b) {
   int ca = *((int*)a);
   int cb = *((int*)b);
-  
   return cb - ca;
 }
 
@@ -46,14 +45,17 @@ Result get_rounds_sum(Config config, int rounds) {
   int times_c = 0;
   for (size_t i = 0; i < rounds; i ++) {
     int generations = nqueen(config);
+    if (generations != MAX_GENERATIONS) {
+      res.success_rate += 1;
+    }
     res.mean += generations;
     times[times_c++] = generations;
-    //printf("generations: %d \n", generations);
   }
 
   qsort(times, times_c, sizeof(int), compare_int);
   res.median = times[times_c/2];
   res.mean /= rounds;
+  res.success_rate /= rounds;
 
   return res;
 }
@@ -67,9 +69,9 @@ void *worker(void *arg_) {
     config.n = (i);
     config.pop_len = config.n*7;
     config.amnt_parents = (int) (config.n*15)/10;
-    config.mutation_rate = 0.20f;
+    config.mutation_rate = 0.05f;
     Result res = get_rounds_sum(config, arg->rounds);
-    printf("n = %d : %d\n", i, res.mean);
+    printf("n = %d : %d %d%%\n", i, res.mean, (int)(res.success_rate*100));
     (arg->results)[i] = res;
   }
   return 0;
@@ -80,7 +82,6 @@ int main() {
 
   size_t work_start = START_N;
   size_t work_end = END_N;
-
   size_t work_size = work_end - work_start;
 
   pthread_t threads[THREADS];
@@ -100,6 +101,7 @@ int main() {
     pthread_create(&threads[i], NULL, worker, &args[i]);
 
   }
+
   for (int  i = 0; i < THREADS; i ++ ){
     pthread_join(threads[i], NULL);
   }
@@ -118,7 +120,8 @@ int main() {
   #ifdef __unix__
   printf("generated plot ./plot.png\n");
 
-  system("python plot.py data.txt");
+  //system("python plot.py data.txt");
+  //system("gnuplot -e 'set terminal pngcairo size 1200,800; set output \"plot.png\"; plot \"data.txt\" using 1:2 with linespoints title \"Mean\", \"data.txt\" using 1:3 with linespoints title \"Median\"'");
 
  #endif
   return 0;

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+#define MAX_GENERATIONS 20000
 
 typedef struct {
   int n;

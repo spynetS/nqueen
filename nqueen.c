@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
+#include <time.h>
+#include <pthread.h>
 
 #include "./nqueen.h"
 
-#define MAX_GENERATIONS 20000
 
 
 Chromosome get_random_state(size_t n) {

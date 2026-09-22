@@ -10,8 +10,7 @@
 #include "./nqueen.h"
 
 
-
-Chromosome get_random_state(size_t n) {
+Chromosome get_rand_r_state(size_t n, unsigned int* seed) {
   Chromosome state;
   state.pos = malloc(sizeof(int) * n);
   state.size = n;
@@ -21,7 +20,7 @@ Chromosome get_random_state(size_t n) {
   }
 
   for (int i = n - 1; i > 0; i--) {
-    int j = rand() % (i + 1);
+    int j = rand_r(seed) % (i + 1);
 
     int tmp = state.pos[i];
     state.pos[i] = state.pos[j];
@@ -30,9 +29,9 @@ Chromosome get_random_state(size_t n) {
   return state;
 }
 
-void populate(int n, Chromosome *population, size_t size) {
+void populate(int n, Chromosome *population, size_t size, unsigned int* seed) {
   for (int i = 0; i < size ; i ++ ) {
-    population[i] = get_random_state(n);
+    population[i] = get_rand_r_state(n, seed);
   }
 }
 
@@ -77,7 +76,7 @@ void selection(Chromosome* population, size_t pop_len, Chromosome* parents, int 
 }
 
 // 2 parents
-Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate) {
+Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate, unsigned int* seed) {
 
   Chromosome child = {0};
   size_t n = parent1.size;
@@ -108,13 +107,13 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
     }
   }
   // mutate if needed
-  float ran = (float)rand() / (float)RAND_MAX;
+  float ran = (float)rand_r(seed) / (float)RAND_MAX;
   if (ran < mutation_rate) {
-    int i = rand() % child.size;
-    int j = rand() % child.size;
+    int i = rand_r(seed) % child.size;
+    int j = rand_r(seed) % child.size;
 
     while (j == i)
-      j = rand() % child.size;
+      j = rand_r(seed) % child.size;
 
     int tmp = child.pos[i];
     child.pos[i] = child.pos[j];
@@ -131,7 +130,7 @@ int nqueen(Config config) {
 
   
   Chromosome* population = malloc(sizeof(Chromosome)*config.pop_len);
-  populate(config.n, population, config.pop_len);
+  populate(config.n, population, config.pop_len, config.random_seed);
   for (int i = 0; i < config.pop_len; i ++) {
     population[i].fitness = fitness(population[i]);
   }
@@ -144,13 +143,13 @@ int nqueen(Config config) {
     Chromosome child = {0};
     for (int j = 0; j < config.pop_len; j ++) {
 
-      int index1 = rand() % config.amnt_parents;
-      int index2 = rand() % config.amnt_parents;
+      int index1 = rand_r(config.random_seed) % config.amnt_parents;
+      int index2 = rand_r(config.random_seed) % config.amnt_parents;
       while (index2 == index1){
-        index2 = rand() % config.amnt_parents;
+        index2 = rand_r(config.random_seed) % config.amnt_parents;
       }
 
-      child = crossover(parents[0], parents[1], config.mutation_rate);
+      child = crossover(parents[0], parents[1], config.mutation_rate, config.random_seed);
       
       // free populations
       free(population[j].pos);

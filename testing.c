@@ -5,10 +5,10 @@
 #include <pthread.h>
 
 #ifndef THREADS
-#define THREADS 2
+#define THREADS 24
 #endif
 #ifndef ROUNDS
-#define ROUNDS 50
+#define ROUNDS 200
 #endif
 #ifndef START_N
 #define START_N 4
@@ -70,6 +70,8 @@ void *worker(void *arg_) {
     config.pop_len = config.n*7;
     config.amnt_parents = (int) (config.n*15)/10;
     config.mutation_rate = 0.05f;
+    unsigned int seed = (unsigned int)time(NULL) ^ (unsigned int)pthread_self();
+    config.random_seed = &seed;
     Result res = get_rounds_sum(config, arg->rounds);
     printf("n = %d : %d %d%%\n", i, res.mean, (int)(res.success_rate*100));
     (arg->results)[i] = res;

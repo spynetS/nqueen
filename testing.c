@@ -8,13 +8,13 @@
 #define THREADS 16
 #endif
 #ifndef ROUNDS
-#define ROUNDS 20
+#define ROUNDS 100
 #endif
 #ifndef START_N
 #define START_N 4
 #endif
 #ifndef END_N
-#define END_N 10
+#define END_N 13
 #endif
 
 typedef struct {

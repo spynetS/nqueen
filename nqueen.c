@@ -51,8 +51,8 @@ int compare_int(const void *a, const void *b) {
   const Chromosome *ca = a;
   const Chromosome *cb = b;
 
-  int x = fitness(*ca);
-  int y = fitness(*cb);
+  int x = ca->fitness;
+  int y = cb->fitness;
   
   return (x > y) - (x < y);
 }
@@ -148,7 +148,8 @@ int nqueen(Config config) {
       // free populations
       free(population[j].pos);
       population[j] = child;
-      if (fitness(child) == 0) {
+      child.fitness = fitness(child);
+      if (child.fitness == 0) {
         sum = i;
         goto DONE;
       }

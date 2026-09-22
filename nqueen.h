@@ -15,6 +15,7 @@ typedef struct {
 typedef struct {
   int* pos;
   size_t size;
+  int fitness;
 } Chromosome;
 
 int nqueen(Config config);

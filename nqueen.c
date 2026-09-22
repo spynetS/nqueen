@@ -4,11 +4,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
+#include <pthread.h>
 
 #include "./nqueen.h"
 
 #define MAX_GENERATIONS 20000
 
+#define THREADS 8
+
+int fitness(Chromosome state);
 
 Chromosome get_random_state(size_t n) {
   Chromosome state;
@@ -39,7 +43,7 @@ int fitness(Chromosome state) {
   int diag_sum = 0;
   for (int i = 0; i < state.size; i ++) {
     for (int j = i+1; j < state.size; j ++) {
-      if (abs(state.pos[j] -state.pos[i]) == abs(j - i) ) {
+      if (abs(state.pos[j] - state.pos[i]) == abs(j - i) ) {
         diag_sum += 1;
       }
     }
@@ -51,8 +55,8 @@ int compare_int(const void *a, const void *b) {
   const Chromosome *ca = a;
   const Chromosome *cb = b;
 
-  int x = fitness(*ca);
-  int y = fitness(*cb);
+  int x = ca->fitness;
+  int y = cb->fitness;
   
   return (x > y) - (x < y);
 }
@@ -126,6 +130,28 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
   return child;
 }
 
+typedef struct {
+  Chromosome* population;
+  int start;
+  int end;
+  bool found;
+} FitnessArg;
+
+
+void* fitness_worker(void *arg_) {
+  FitnessArg* arg = (FitnessArg*)arg_;
+
+  for (int j = arg->start; j < arg->end; j ++){
+	  int fit = fitness(arg->population[j]);
+    arg->population[j].fitness = fit;
+    if (fit == 0) {
+      arg->found = true;
+      break;
+    }
+  }
+}
+
+
 int nqueen(Config config) {
   assert(config.pop_len >= config.amnt_parents);
   assert(config.n >= 4);
@@ -138,21 +164,52 @@ int nqueen(Config config) {
   // as default it is the max generations
   int sum = MAX_GENERATIONS;
 
+  pthread_t threads[THREADS];
+  FitnessArg args[THREADS];
+
   for (int i = 0; i < MAX_GENERATIONS; i ++) {
-    Chromosome* parents = malloc(sizeof(Chromosome) * config.amnt_parents);
-    selection(population, config.pop_len, parents, config.amnt_parents);
-    Chromosome child = {0};
-    for (int j = 0; j < config.pop_len; j ++) {
-      // TODO select randomly 2 parents
-      child = crossover(parents[0], parents[1], config.mutation_rate);
-      // free populations
-      free(population[j].pos);
-      population[j] = child;
-      if (fitness(child) == 0) {
+
+    int chunk = config.pop_len / THREADS;
+    for (int t = 0; t < THREADS; t ++) {
+
+      args[t].start = t * chunk;
+
+      if (t == THREADS - 1)
+        args[t].end = config.pop_len;
+      else
+        args[t].end = (t + 1) * chunk;
+
+      args[t].found = false;
+      args[t].population = population;
+
+      pthread_create(&threads[t], NULL, fitness_worker, &args[t]);
+    }
+
+    for (int k = 0; k < THREADS; k ++) {
+      pthread_join(threads[k], NULL);
+      if (args[k].found == true) {
         sum = i;
         goto DONE;
       }
     }
+
+    Chromosome* parents = malloc(sizeof(Chromosome) * config.amnt_parents);
+    selection(population, config.pop_len, parents, config.amnt_parents);
+    Chromosome child = {0};
+    // So this forloop basicly
+    for (int j = 0; j < config.pop_len; j ++) {
+      int index1 = rand() % (config.amnt_parents);
+      int index2 = rand() % (config.amnt_parents);
+      while(index2 == index1){
+        index2 = rand() % (config.amnt_parents);
+      }
+
+      child = crossover(parents[index1], parents[index2], config.mutation_rate);
+      // free populations
+      free(population[j].pos);
+      population[j] = child;
+    }
+
     for (int j = 0; j < config.amnt_parents; j ++ ) {
       free(parents[j].pos);
     }

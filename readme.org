@@ -21,3 +21,4 @@ make run
 
 * TODO
 1. Make the algorithm multithreaded
+2. We could use EA to optimize the algorithm paramters

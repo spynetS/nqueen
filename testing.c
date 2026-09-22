@@ -4,17 +4,17 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#ifndef THREADS
-#define THREADS 16
-#endif
+//#ifndef THREADS
+#define THREADS 1
+//#endif
 #ifndef ROUNDS
-#define ROUNDS 20
+#define ROUNDS 10
 #endif
 #ifndef START_N
 #define START_N 4
 #endif
 #ifndef END_N
-#define END_N 10
+#define END_N 13
 #endif
 
 typedef struct {
@@ -102,9 +102,8 @@ int main() {
   fclose(file);
   #ifdef __unix__
   printf("generated plot ./plot.png\n");
-  system("gnuplot -e 'set terminal png; set output \"plot.png\"; plot "
-         "\"data.txt\" using 1:2 with lines'");
-    system("gnuplot -e 'set terminal png; set output \"plot-smooth.png\"; plot \"data.txt\" using 1:2 smooth csplines with lines'");
+  system("python plot.py data.txt");
+
   #endif
   return 0;
 }

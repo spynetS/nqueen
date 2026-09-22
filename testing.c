@@ -4,10 +4,18 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define THREADS 12
-#define ROUNDS 100
+#ifndef THREADS
+#define THREADS 16
+#endif
+#ifndef ROUNDS
+#define ROUNDS 20
+#endif
+#ifndef START_N
 #define START_N 4
-#define END_N 20
+#endif
+#ifndef END_N
+#define END_N 10
+#endif
 
 typedef struct {
   int rounds;
@@ -82,7 +90,7 @@ int main() {
   }
 
   // handling output
-  FILE* file = fopen("data.txt", "w");
+  FILE* file = fopen("data.txt", "a");
   if (file == NULL) {
     exit(1);
   }
@@ -94,7 +102,9 @@ int main() {
   fclose(file);
   #ifdef __unix__
   printf("generated plot ./plot.png\n");
-  system("gnuplot -e 'set terminal png; set output \"plot.png\"; plot \"data.txt\" using 1:2 with lines'");
+  system("gnuplot -e 'set terminal png; set output \"plot.png\"; plot "
+         "\"data.txt\" using 1:2 with lines'");
+    system("gnuplot -e 'set terminal png; set output \"plot-smooth.png\"; plot \"data.txt\" using 1:2 smooth csplines with lines'");
   #endif
   return 0;
 }

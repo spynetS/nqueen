@@ -19,4 +19,5 @@ make run
 #+end_src
 
 
-
+* TODO
+1. Make the algorithm multithreaded

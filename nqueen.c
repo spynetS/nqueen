@@ -134,7 +134,9 @@ int nqueen(Config config) {
   
   Chromosome* population = malloc(sizeof(Chromosome)*config.pop_len);
   populate(config.n, population, config.pop_len);
-
+  for (int i = 0; i < config.pop_len; i ++) {
+    population[i].fitness = fitness(population[i]);
+  }
   // as default it is the max generations
   int sum = MAX_GENERATIONS;
 

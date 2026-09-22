@@ -8,7 +8,7 @@
 #define THREADS 16
 #endif
 #ifndef ROUNDS
-#define ROUNDS 100
+#define ROUNDS 200
 #endif
 #ifndef START_N
 #define START_N 4
@@ -52,7 +52,7 @@ void *worker(void *arg_) {
     config.n = (i);
     config.pop_len = config.n*7;
     config.amnt_parents = (int) (config.n*15)/10;
-    config.mutation_rate = 0.05f;
+    config.mutation_rate = 0.20f;
     int a = get_avarage(config, arg->rounds);
     printf("n = %d : %d\n", i, a);
     (arg->results)[i] = a;
@@ -102,9 +102,9 @@ int main() {
   fclose(file);
   #ifdef __unix__
   printf("generated plot ./plot.png\n");
-  system("gnuplot -e 'set terminal png; set output \"plot.png\"; plot "
-         "\"data.txt\" using 1:2 with lines'");
-    system("gnuplot -e 'set terminal png; set output \"plot-smooth.png\"; plot \"data.txt\" using 1:2 smooth csplines with lines'");
-  #endif
+
+  system("python plot.py data.txt");
+
+ #endif
   return 0;
 }

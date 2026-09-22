@@ -44,17 +44,14 @@ int fitness(Chromosome state) {
       }
     }
   }
-  return diag_sum;
+  return state.size-diag_sum;
 }
 
-int compare_int(const void *a, const void *b) {
+int compare_fit(const void *a, const void *b) {
   const Chromosome *ca = a;
   const Chromosome *cb = b;
-
-  int x = ca->fitness;
-  int y = cb->fitness;
   
-  return (x > y) - (x < y);
+  return cb->fitness - ca->fitness;
 }
 
 void print_chromosome(Chromosome state) { 
@@ -66,7 +63,7 @@ void print_chromosome(Chromosome state) {
 
 
 void selection(Chromosome* population, size_t pop_len, Chromosome* parents, int amnt_parent) {
-  qsort(population, pop_len, sizeof(Chromosome), compare_int);
+  qsort(population, pop_len, sizeof(Chromosome), compare_fit);
 
   for (int i = 0; i < amnt_parent; i ++ ) {
     parents[i].pos = malloc(sizeof(int) * population[i].size);
@@ -145,14 +142,26 @@ int nqueen(Config config) {
     selection(population, config.pop_len, parents, config.amnt_parents);
     Chromosome child = {0};
     for (int j = 0; j < config.pop_len; j ++) {
-      // TODO select randomly 2 parents
+
+      int index1 = rand() % config.amnt_parents;
+      int index2 = rand() % config.amnt_parents;
+      while (index2 == index1){
+        index2 = rand() % config.amnt_parents;
+      }
+
       child = crossover(parents[0], parents[1], config.mutation_rate);
+      
       // free populations
       free(population[j].pos);
-      population[j] = child;
       child.fitness = fitness(child);
-      if (child.fitness == 0) {
+      population[j] = child;
+      
+      if (child.fitness == config.n) {
         sum = i;
+        for (int j = 0; j < config.amnt_parents; j ++ ) {
+          free(parents[j].pos);
+        }
+        free(parents);
         goto DONE;
       }
     }

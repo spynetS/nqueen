@@ -15,14 +15,14 @@ def read_data(filename):
             if not line:
                 continue
 
-            x, y = map(float, line.split())
+            x, y1, y2 = map(float, line.split())
 
             # x appeared again / wrapped back around -> new line
             if current_line and x <= current_line[-1][0]:
                 lines.append(current_line)
                 current_line = []
 
-            current_line.append((x, y))
+            current_line.append((x, y1, y2))
 
     if current_line:
         lines.append(current_line)
@@ -35,9 +35,11 @@ def plot_data(filename):
 
     for i, line in enumerate(lines):
         x = [point[0] for point in line]
-        y = [point[1] for point in line]
+        y1 = [point[1] for point in line]
+        y2 = [point[2] for point in line]
 
-        plt.plot(x, y, marker="o", label=f"Run {i + 1}")
+        plt.plot(x, y1, marker="o", label=f"Run {i + 1} MEAN")
+        plt.plot(x, y2, marker="o", label=f"Run {i + 1} MEDIAN")
 
     plt.xlabel("X")
     plt.ylabel("Y")

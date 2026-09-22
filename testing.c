@@ -5,7 +5,7 @@
 #include <pthread.h>
 
 #ifndef THREADS
-#define THREADS 16
+#define THREADS 12
 #endif
 #ifndef ROUNDS
 #define ROUNDS 200
@@ -17,30 +17,45 @@
 #define END_N 13
 #endif
 
-typedef struct {
-  int rounds;
-  size_t start;
-  size_t end;
-  int *results;
-} Arg;
 
 typedef struct {
-  int generations;
-  int average;
+  int mean;
+  int median;
   float success_rate;
 
 } Result;
 
-int get_avarage(Config config, int rounds) {
-  int sum = 0;
+typedef struct {
+  int rounds;
+  size_t start;
+  size_t end;
+  Result *results;
+} Arg;
 
+int compare_int(const void *a, const void *b) {
+  int ca = *((int*)a);
+  int cb = *((int*)b);
+  
+  return cb - ca;
+}
+
+
+Result get_rounds_sum(Config config, int rounds) {
+  Result res = {0};
+  int times[rounds];
+  int times_c = 0;
   for (size_t i = 0; i < rounds; i ++) {
     int generations = nqueen(config);
-    sum += generations;
+    res.mean += generations;
+    times[times_c++] = generations;
     //printf("generations: %d \n", generations);
   }
-  return sum/rounds;
 
+  qsort(times, times_c, sizeof(int), compare_int);
+  res.median = times[times_c/2];
+  res.mean /= rounds;
+
+  return res;
 }
 
 void *worker(void *arg_) {
@@ -53,9 +68,9 @@ void *worker(void *arg_) {
     config.pop_len = config.n*7;
     config.amnt_parents = (int) (config.n*15)/10;
     config.mutation_rate = 0.20f;
-    int a = get_avarage(config, arg->rounds);
-    printf("n = %d : %d\n", i, a);
-    (arg->results)[i] = a;
+    Result res = get_rounds_sum(config, arg->rounds);
+    printf("n = %d : %d\n", i, res.mean);
+    (arg->results)[i] = res;
   }
   return 0;
 }
@@ -70,7 +85,7 @@ int main() {
 
   pthread_t threads[THREADS];
   Arg args[THREADS];
-  int results[work_end];
+  Result results[work_end];
   
   for (int  i = 0; i < THREADS; i ++ ){
     size_t start = work_start + i * work_size / THREADS;
@@ -96,7 +111,7 @@ int main() {
   }
 
   for (int i = work_start; i < work_end; i++) {
-    fprintf(file, "%d %d\n",i, results[i]);
+    fprintf(file, "%d %d %d\n",i, results[i].mean, results[i].median);
   }
 
   fclose(file);

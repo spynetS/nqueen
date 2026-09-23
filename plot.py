@@ -30,7 +30,7 @@ def read_data(filename):
     return lines
 
 
-def plot_data(filename):
+def plot_data(filename, output=None):
     lines = read_data(filename)
 
     for i, line in enumerate(lines):
@@ -46,12 +46,20 @@ def plot_data(filename):
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.show()
+
+    if output:
+        plt.savefig(output, dpi=300)
+        print(f"Saved plot to {output}")
+    else:
+        plt.show()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <datafile>")
+    if len(sys.argv) not in (2, 3):
+        print(f"Usage: {sys.argv[0]} <datafile> [outputfile]")
         sys.exit(1)
 
-    plot_data(sys.argv[1])
+    input_file = sys.argv[1]
+    output_file = sys.argv[2] if len(sys.argv) == 3 else None
+
+    plot_data(input_file, output_file)

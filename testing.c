@@ -5,10 +5,10 @@
 #include <pthread.h>
 
 #ifndef THREADS
-#define THREADS 24
+#define THREADS 16
 #endif
 #ifndef ROUNDS
-#define ROUNDS 200
+#define ROUNDS 50
 #endif
 #ifndef START_N
 #define START_N 4
@@ -17,6 +17,9 @@
 #define END_N 13
 #endif
 
+int pop_mod = 2;
+int par_percent = 10;
+int mut_percent = 5;
 
 typedef struct {
   int mean;
@@ -67,9 +70,11 @@ void *worker(void *arg_) {
 
     Config config = {0};
     config.n = (i);
-    config.pop_len = config.n*7;
-    config.amnt_parents = (int) (config.n*15)/10;
-    config.mutation_rate = 0.05f;
+    config.pop_len = config.n * pop_mod;
+    config.amnt_parents = (int)(config.pop_len * par_percent)/100;
+    if (config.amnt_parents <= 2) config.amnt_parents = 2;
+    config.mutation_rate = (float)mut_percent/100;
+
     unsigned int seed = (unsigned int)time(NULL) ^ (unsigned int)pthread_self();
     config.random_seed = &seed;
     Result res = get_rounds_sum(config, arg->rounds);
@@ -79,7 +84,23 @@ void *worker(void *arg_) {
   return 0;
 }
 
-int main() {
+int main(int argc, char** argv) {
+  
+  if (argc >= 2) {
+    pop_mod = atoi(argv[1]);
+  }
+  else {
+    printf("usage -- \n Expects 3 arguments all integers\n nqueen <population moddifer> <parent percentage of population> <mutation percentage>\n default nqueen 2 10 5\n");
+    return 1;
+  }
+  if (argc >= 3) {
+    par_percent = atoi(argv[2]);
+  }
+  if (argc >= 4) {
+    mut_percent = atoi(argv[3]);
+  }
+
+
   srand(time(NULL));
 
   size_t work_start = START_N;

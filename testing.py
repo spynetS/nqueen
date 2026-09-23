@@ -1,43 +1,12 @@
-import nqueen
-import math
-import matplotlib.pyplot as plt
-from concurrent.futures import ThreadPoolExecutor
-
-
-class Config:
-    def __init__(self, n: int, pop_len: int, parents: int,  mutation_rate:float):
-        assert(pop_len >= parents)
-        self.n = n
-        self.pop_len = pop_len
-        self.parents = parents
-        self.mutation_rate = mutation_rate
-
-
-def get_average(config: Config, rounds: int = 10, verbose: bool = False):
-    """ Runs the algorithm rounds times and calculates the averate and returns it """
-    if verbose: print("N = ", config.n)
-    sum_ = 0
-    for i in range(rounds):
-        generations, state = nqueen.nqueen(config.n, config.pop_len, config.parents, config.mutation_rate)
-        # nqueen.print_state(state)
-        sum_ += generations
-        if verbose: print(i,"/",rounds,"->", generations)
-    return sum_/rounds
+import os
 
 if __name__ == "__main__":
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        start = 4
-        end = 12
-        futures = [
-            executor.submit(get_average, Config(i, i*7, math.ceil(i*1.5), 0.05), 50, True)
-            for i in range(start,end)
-        ]
-        
-        results = [future.result() for future in futures]
-
-        x = range(start, end)
-        plt.plot(x, results)
-        plt.xlabel("N")
-        plt.ylabel("Average generations")
-        plt.title("N-Queens Evolution")
-        plt.show()
+    populations = [2,5,7]
+    parents = [10,20]
+    mutations = [5,20]
+    for pop in populations:
+        for par in parents:
+            os.system(f"make clear")
+            for mut in mutations:
+                os.system(f"./nqueen {pop} {par} {mut}")
+            os.system(f"python ./plot.py data.txt p{pop}_par{par}_mut{mut}.png")

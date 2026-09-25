@@ -106,4 +106,3 @@ if __name__ == "__main__":
     #     sum_ += gen
     # print("average", sum_)
     print_state([7,5,7,0,6,0,7,7])
-

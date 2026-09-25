@@ -8,7 +8,7 @@
 #define THREADS 16
 #endif
 #ifndef ROUNDS
-#define ROUNDS 50
+#define ROUNDS 200
 #endif
 #ifndef START_N
 #define START_N 4

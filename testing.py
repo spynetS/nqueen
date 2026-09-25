@@ -1,9 +1,9 @@
 import os
 
 if __name__ == "__main__":
-    populations = [2,5,7]
-    parents = [10,20]
-    mutations = [5,20]
+    populations = [2,5]
+    parents = [5,10]
+    mutations = [1,4]
     for pop in populations:
         for par in parents:
             os.system(f"make clear")

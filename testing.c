@@ -3,18 +3,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <math.h>
 
 #ifndef THREADS
 #define THREADS 16
 #endif
 #ifndef ROUNDS
-#define ROUNDS 200
+#define ROUNDS 10
 #endif
 #ifndef START_N
-#define START_N 4
+#define START_N 7
 #endif
 #ifndef END_N
-#define END_N 13
+#define END_N 8
 #endif
 
 int pop_mod = 2;
@@ -24,8 +25,9 @@ int mut_percent = 5;
 typedef struct {
   int mean;
   int median;
+  double stdev;
   float success_rate;
-
+  
 } Result;
 
 typedef struct {
@@ -46,6 +48,7 @@ Result get_rounds_sum(Config config, int rounds) {
   Result res = {0};
   int times[rounds];
   int times_c = 0;
+  
   for (size_t i = 0; i < rounds; i ++) {
     int generations = nqueen(config);
     if (generations != MAX_GENERATIONS) {
@@ -55,10 +58,18 @@ Result get_rounds_sum(Config config, int rounds) {
     times[times_c++] = generations;
   }
 
+  res.success_rate /= rounds;
+
+  res.mean /= rounds;
+  double stdev_sum = 0;
+  for (size_t i = 0; i < rounds; i ++) {
+    stdev_sum += (res.mean - times[i]) * (res.mean - times[i]);
+    printf("%zu: %d\n", i, times[i]);
+  }
+  res.stdev = sqrt(stdev_sum/(rounds-1));
+
   qsort(times, times_c, sizeof(int), compare_int);
   res.median = times[times_c/2];
-  res.mean /= rounds;
-  res.success_rate /= rounds;
 
   return res;
 }
@@ -136,7 +147,7 @@ int main(int argc, char** argv) {
   }
 
   for (int i = work_start; i < work_end; i++) {
-    fprintf(file, "%d %d %d\n",i, results[i].mean, results[i].median);
+    fprintf(file, "%d %d %f\n",i, results[i].mean, results[i].stdev);
   }
 
   fclose(file);

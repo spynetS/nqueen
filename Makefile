@@ -1,4 +1,4 @@
-CC = gcc -Wall -pedantic -O3
+CC = gcc -Wall -pedantic -O3 -lm
 
 nqueen: nqueen.c testing.c check-gnuplot
 	$(CC) nqueen.c testing.c -o nqueen

@@ -158,7 +158,7 @@ int nqueen(Config config) {
         index2 = rand_r(config.random_seed) % config.amnt_parents;
       }
 
-      child = crossover(parents[0], parents[1], config.mutation_rate, config.random_seed);
+      child = crossover(parents[index1], parents[index2], config.mutation_rate, config.random_seed);
       
       // free populations
       free(population[j].pos);

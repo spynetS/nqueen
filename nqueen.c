@@ -62,18 +62,17 @@ void print_chromosome(Chromosome state) {
 }
 
 
-void selection(Chromosome* population, size_t pop_len, Chromosome* parents, int amnt_parent) {
-  qsort(population, pop_len, sizeof(Chromosome), compare_fit);
-
-  for (int i = 0; i < amnt_parent; i ++ ) {
-    parents[i].pos = malloc(sizeof(int) * population[i].size);
-    for (int j = 0; j < population[i].size; j ++ ) {
-      parents[i].pos[j] = population[i].pos[j];
-    }
-    parents[i].size = population[i].size;
+size_t selection(Chromosome* population, size_t pop_len, unsigned int * seed) {
+  size_t k = pop_len / 2;
+  size_t fittest = rand_r(seed) % (pop_len - 1);
+  for(int i = 0; i < k ; i++){
+    size_t candidate = rand_r(seed) % pop_len;
+    if (population[candidate].fitness > population[fittest].fitness)
+      fittest = candidate;
   }
-  
- }
+
+  return fittest;
+}
 
 void mutate(Chromosome *child, unsigned int* seed) {
   int i = rand_r(seed) % child->size;
@@ -145,20 +144,17 @@ int nqueen(Config config) {
   int sum = MAX_GENERATIONS;
 
   for (int i = 0; i < MAX_GENERATIONS; i ++) {
-    Chromosome* parents = malloc(sizeof(Chromosome) * config.amnt_parents);
-    selection(population, config.pop_len, parents, config.amnt_parents);
     
     Chromosome child = {0};
     for (int j = 0; j < config.pop_len; j ++) {
 
       // pick randomly the parents from the parents array
-      int index1 = rand_r(config.random_seed) % config.amnt_parents;
-      int index2 = rand_r(config.random_seed) % config.amnt_parents;
-      while (index2 == index1){
-        index2 = rand_r(config.random_seed) % config.amnt_parents;
-      }
+      size_t parent1 = selection(population, config.pop_len, config.random_seed);
+      size_t parent2 = selection(population, config.pop_len, config.random_seed);
 
-      child = crossover(parents[index1], parents[index2], config.mutation_rate, config.random_seed);
+      while(parent1 == parent2) parent2 = selection(population, config.pop_len, config.random_seed);
+
+      child = crossover(population[parent1], population[parent2], config.mutation_rate, config.random_seed);
       
       // free populations
       free(population[j].pos);
@@ -168,17 +164,9 @@ int nqueen(Config config) {
       // check child fitness (if it's complete we stop)
       if (child.fitness == config.n) {
         sum = i;
-        for (int j = 0; j < config.amnt_parents; j ++ ) {
-          free(parents[j].pos);
-        }
-        free(parents);
         goto DONE;
       }
     }
-    for (int j = 0; j < config.amnt_parents; j ++ ) {
-      free(parents[j].pos);
-    }
-    free(parents);
   }
 
  // free the population and return the sum

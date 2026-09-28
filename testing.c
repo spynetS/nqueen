@@ -12,21 +12,20 @@
 #define ROUNDS 10
 #endif
 #ifndef START_N
-#define START_N 7
+#define START_N 4
 #endif
 #ifndef END_N
-#define END_N 8
+#define END_N 19
 #endif
 
-int pop_mod = 2;
-int par_percent = 10;
+int pop_mod = 5;
 int mut_percent = 5;
 
 typedef struct {
   int mean;
   int median;
   double stdev;
-  float success_rate;
+  double success_rate;
   
 } Result;
 
@@ -53,20 +52,19 @@ Result get_rounds_sum(Config config, int rounds) {
     int generations = nqueen(config);
     if (generations != MAX_GENERATIONS) {
       res.success_rate += 1;
+      res.mean += generations;
+      times[times_c++] = generations;
     }
-    res.mean += generations;
-    times[times_c++] = generations;
   }
 
   res.success_rate /= rounds;
 
-  res.mean /= rounds;
+  res.mean /= times_c;
   double stdev_sum = 0;
-  for (size_t i = 0; i < rounds; i ++) {
+  for (size_t i = 0; i < times_c; i ++) {
     stdev_sum += (res.mean - times[i]) * (res.mean - times[i]);
-    printf("%zu: %d\n", i, times[i]);
   }
-  res.stdev = sqrt(stdev_sum/(rounds-1));
+  res.stdev = sqrt(stdev_sum/(times_c-1));
 
   qsort(times, times_c, sizeof(int), compare_int);
   res.median = times[times_c/2];
@@ -82,8 +80,6 @@ void *worker(void *arg_) {
     Config config = {0};
     config.n = (i);
     config.pop_len = config.n * pop_mod;
-    config.amnt_parents = (int)(config.pop_len * par_percent)/100;
-    if (config.amnt_parents <= 2) config.amnt_parents = 2;
     config.mutation_rate = (float)mut_percent/100;
 
     unsigned int seed = (unsigned int)time(NULL) ^ (unsigned int)pthread_self();
@@ -105,10 +101,7 @@ int main(int argc, char** argv) {
     return 1;
   }
   if (argc >= 3) {
-    par_percent = atoi(argv[2]);
-  }
-  if (argc >= 4) {
-    mut_percent = atoi(argv[3]);
+    mut_percent = atoi(argv[2]);
   }
 
 
@@ -147,7 +140,7 @@ int main(int argc, char** argv) {
   }
 
   for (int i = work_start; i < work_end; i++) {
-    fprintf(file, "%d %d %f\n",i, results[i].mean, results[i].stdev);
+    fprintf(file, "%d %d %f %d\n",i, results[i].mean, results[i].stdev, (int)(results[i].success_rate*100));
   }
 
   fclose(file);

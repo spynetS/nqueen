@@ -13,12 +13,12 @@ pyplot:
 gnuplot:
 	gnuplot -e 'set terminal pngcairo size 1200,800; set output "plot.png"; plot "data.txt" using 1:2 with linespoints title "Mean", "data.txt" using 1:3 with linespoints title "Median"'
 
-pytest:
+pytest: nqueen
 	python testing.py
 
 clear:
 	rm data.txt
 
 run: nqueen
-	./nqueen 2 10 5
+	./nqueen 2 5
 

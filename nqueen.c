@@ -9,6 +9,8 @@
 
 #include "./nqueen.h"
 
+//#define ROULETTE
+
 
 Chromosome get_rand_r_state(size_t n, unsigned int* seed) {
   Chromosome state;
@@ -44,7 +46,11 @@ int fitness(Chromosome state) {
       }
     }
   }
-  return state.size-diag_sum;
+  #ifdef ROULETTE
+  return (state.size * (state.size - 1) / 2)  - diag_sum;
+  #else
+  return state.size - diag_sum;
+  #endif
 }
 
 int compare_fit(const void *a, const void *b) {
@@ -61,10 +67,33 @@ void print_chromosome(Chromosome state) {
   printf("\nfitness %d\n", fitness(state));
 }
 
+#ifdef ROULETTE
+size_t selection(Chromosome* population, size_t pop_len, unsigned int *seed) {
+  int total_fitness = 0;
 
+  for (size_t i = 0; i < pop_len; i++) {
+    total_fitness += population[i].fitness;
+  }
+  assert(total_fitness > 0);
+  int r = rand_r(seed) % total_fitness;
+  int cumulative = 0;
+      
+  for (size_t i = 0; i < pop_len; i++) {
+    cumulative += population[i].fitness;
+
+    if (r < cumulative) {
+      return i;
+    }
+  }
+
+  return pop_len - 1;
+}
+#else
 size_t selection(Chromosome* population, size_t pop_len, unsigned int * seed) {
+  // Tournament selection
+  assert(pop_len >= 2);
   size_t k = pop_len / 2;
-  size_t fittest = rand_r(seed) % (pop_len - 1);
+  size_t fittest = rand_r(seed) % (pop_len);
   for(int i = 0; i < k ; i++){
     size_t candidate = rand_r(seed) % pop_len;
     if (population[candidate].fitness > population[fittest].fitness)
@@ -73,6 +102,7 @@ size_t selection(Chromosome* population, size_t pop_len, unsigned int * seed) {
 
   return fittest;
 }
+#endif
 
 void mutate(Chromosome *child, unsigned int* seed) {
   int i = rand_r(seed) % child->size;
@@ -103,7 +133,8 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
 
   // copy the first half from parent 1x
   int pos = 0;
-  for (int i = 0; i < n/2; i ++) {
+  int split = rand_r(seed) % (n - 1) + 1;
+  for (int i = 0; i < split; i ++) {
     child.pos[i] = parent1.pos[i];
     used[parent1.pos[i]] = true;
     pos += 1;
@@ -129,9 +160,7 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
 
 
 int nqueen(Config config) {
-  assert(config.pop_len >= config.amnt_parents);
   assert(config.n >= 4);
-  assert(config.amnt_parents >= 2);
 
   // create the initial population
   Chromosome* population = malloc(sizeof(Chromosome)*config.pop_len);
@@ -144,6 +173,7 @@ int nqueen(Config config) {
   int sum = MAX_GENERATIONS;
 
   for (int i = 0; i < MAX_GENERATIONS; i ++) {
+    Chromosome *new_population = malloc(sizeof(Chromosome) * config.pop_len);
     
     Chromosome child = {0};
     for (int j = 0; j < config.pop_len; j ++) {
@@ -156,17 +186,25 @@ int nqueen(Config config) {
 
       child = crossover(population[parent1], population[parent2], config.mutation_rate, config.random_seed);
       
-      // free populations
-      free(population[j].pos);
       child.fitness = fitness(child);
-      population[j] = child;
+      new_population[j] = child;
 
       // check child fitness (if it's complete we stop)
-      if (child.fitness == config.n) {
+      #ifdef ROULETTE
+      int max = (config.n * (config.n - 1) / 2);
+      #else
+      int max = config.n;
+      #endif
+      if (child.fitness == max) {
         sum = i;
         goto DONE;
       }
     }
+    for (int j = 0; j < config.pop_len; j ++) {
+      free(population[j].pos);
+    }
+    free(population);
+    population = new_population;
   }
 
  // free the population and return the sum

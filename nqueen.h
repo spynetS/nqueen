@@ -8,7 +8,6 @@
 typedef struct {
   int n;
   int pop_len;
-  int amnt_parents;
   float mutation_rate;
   unsigned int* random_seed;
 } Config;

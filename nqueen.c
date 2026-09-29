@@ -46,11 +46,7 @@ int fitness(Chromosome state) {
       }
     }
   }
-  #ifdef ROULETTE
   return (state.size * (state.size - 1) / 2)  - diag_sum;
-  #else
-  return state.size - diag_sum;
-  #endif
 }
 
 int compare_fit(const void *a, const void *b) {
@@ -190,11 +186,7 @@ int nqueen(Config config) {
       new_population[j] = child;
 
       // check child fitness (if it's complete we stop)
-      #ifdef ROULETTE
       int max = (config.n * (config.n - 1) / 2);
-      #else
-      int max = config.n;
-      #endif
       if (child.fitness == max) {
         sum = i;
         goto DONE;

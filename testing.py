@@ -1,8 +1,8 @@
 import os
 
 if __name__ == "__main__":
-    populations = [2,8]
-    mutations = [1,5]
+    populations = [5]
+    mutations = [1,5,20,50,75,90,100]
     for mut in mutations:
         os.system(f"make clear")
         for pop in populations:

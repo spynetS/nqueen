@@ -9,13 +9,13 @@
 #define THREADS 16
 #endif
 #ifndef ROUNDS
-#define ROUNDS 10
+#define ROUNDS 50
 #endif
 #ifndef START_N
 #define START_N 4
 #endif
 #ifndef END_N
-#define END_N 19
+#define END_N 31
 #endif
 
 int pop_mod = 5;

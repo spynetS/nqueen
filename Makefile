@@ -20,5 +20,5 @@ clear:
 	rm data.txt
 
 run: nqueen
-	./nqueen 2 5
+	./nqueen 5 90
 

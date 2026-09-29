@@ -9,10 +9,10 @@
 #define THREADS 16
 #endif
 #ifndef ROUNDS
-#define ROUNDS 50
+#define ROUNDS 10
 #endif
 #ifndef START_N
-#define START_N 4
+#define START_N 8
 #endif
 #ifndef END_N
 #define END_N 31
@@ -58,17 +58,17 @@ Result get_rounds_sum(Config config, int rounds) {
   }
 
   res.success_rate /= rounds;
+  if (times_c > 0) {
+    res.mean /= times_c;
+    double stdev_sum = 0;
+    for (size_t i = 0; i < times_c; i ++) {
+      stdev_sum += (res.mean - times[i]) * (res.mean - times[i]);
+    }
+    res.stdev = sqrt(stdev_sum/(times_c-1));
 
-  res.mean /= times_c;
-  double stdev_sum = 0;
-  for (size_t i = 0; i < times_c; i ++) {
-    stdev_sum += (res.mean - times[i]) * (res.mean - times[i]);
+    qsort(times, times_c, sizeof(int), compare_int);
+    res.median = times[times_c/2];
   }
-  res.stdev = sqrt(stdev_sum/(times_c-1));
-
-  qsort(times, times_c, sizeof(int), compare_int);
-  res.median = times[times_c/2];
-
   return res;
 }
 

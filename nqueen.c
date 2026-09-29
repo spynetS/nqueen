@@ -9,7 +9,7 @@
 
 #include "./nqueen.h"
 
-//#define ROULETTE
+#define ROULETTE
 
 
 Chromosome get_rand_r_state(size_t n, unsigned int* seed) {

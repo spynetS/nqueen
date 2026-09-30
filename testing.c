@@ -6,10 +6,10 @@
 #include <math.h>
 
 #ifndef THREADS
-#define THREADS 16
+#define THREADS 24
 #endif
 #ifndef ROUNDS
-#define ROUNDS 10
+#define ROUNDS 50
 #endif
 #ifndef START_N
 #define START_N 8

@@ -9,9 +9,9 @@
 
 #include "./nqueen.h"
 
-#define ROULETTE
-
-
+/* #ifndef */
+/* //#define ROULETTE */
+/* #endif */
 Chromosome get_rand_r_state(size_t n, unsigned int* seed) {
   Chromosome state;
   state.pos = malloc(sizeof(int) * n);

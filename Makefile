@@ -1,7 +1,9 @@
-CC = gcc -Wall -pedantic -O3 -lm
+CC = gcc 
+CFLAGS = -Wall -pedantic -O3 -lm
+CFLAGS += $(ROULETTE)
 
 nqueen: nqueen.c testing.c check-gnuplot
-	$(CC) nqueen.c testing.c -o nqueen
+	$(CC) $(CFLAGS) nqueen.c testing.c -o nqueen
 
 check-gnuplot:
 	@command -v gnuplot >/dev/null || \

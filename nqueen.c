@@ -46,6 +46,7 @@ int fitness(Chromosome state) {
       }
     }
   }
+
   return (state.size * (state.size - 1) / 2)  - diag_sum;
 }
 
@@ -88,7 +89,7 @@ size_t selection(Chromosome* population, size_t pop_len, unsigned int *seed) {
 size_t selection(Chromosome* population, size_t pop_len, unsigned int * seed) {
   // Tournament selection
   assert(pop_len >= 2);
-  size_t k = pop_len / 2;
+  size_t k = 2;
   size_t fittest = rand_r(seed) % (pop_len);
   for(int i = 0; i < k ; i++){
     size_t candidate = rand_r(seed) % pop_len;

@@ -3,7 +3,7 @@ import shutil
 
 def test(populations, mutations, file_name = ""):
     for pop in populations:
-        os.system("make clear")
+        #os.system("make clear")
         for mut in mutations:
             with open("data.txt", "a") as f:
                 f.write(f"{mut}% mutation probability\n")
@@ -13,16 +13,22 @@ def test(populations, mutations, file_name = ""):
         if file_name != "":
             shutil.copy("./data.txt", file_name)
 
-if __name__ == "__main__":
+def bla():
     # test the tournament mutation
-    test([2], [1,5,10,20,40,60,80,100], "tournament-mut-1-100.txt")
-    test([2], [60,80], "tournament-mut-60-100.txt")
+    test([2], [1,5,10,20,40,60,80,100], "tournament-k2-mut-1-100.txt")
+    test([2], [60,80], "tournament-k2-mut-60-80.txt")
     # create the comparison
     os.system("./nqueen 2 80")
-    os.system("make nqueen ROULETTE=-DROULETTE")
-    os.system("./nqueen 2 60")
-    shutil.copy("./data.txt", "tournament-vs-roulette.txt")
-    os.system("make clear")
+ #    os.system("make nqueen ROULETTE=-DROULETTE")
+#     os.system("./nqueen 2 60")
+#     shutil.copy("./data.txt", "tournament-vs-roulette.txt")
+#     os.system("make clear")
     
-    # create the tests for roulette
-    test([2], [1,5,10,20,40,60,80,100], "roulette-mut-1-100.txt")
+#     # create the tests for roulette
+#     test([2], [1,5,10,20,40,60,80,100], "roulette-mut-1-100.txt")
+# -
+
+if __name__ == "__main__":
+    # #os.system("make nqueen ROULETTE=-DROULETTE")
+    # test([2,8],[80], "tournament-population-test.txt")
+    bla()

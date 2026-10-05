@@ -181,8 +181,6 @@ int nqueen(Config config) {
       size_t parent1 = selection(population, config.pop_len, config.random_seed);
       size_t parent2 = selection(population, config.pop_len, config.random_seed);
 
-      while(parent1 == parent2) parent2 = selection(population, config.pop_len, config.random_seed);
-
       child = crossover(population[parent1], population[parent2], config.mutation_rate, config.random_seed);
       
       child.fitness = fitness(child);

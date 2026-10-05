@@ -91,7 +91,9 @@ size_t selection(Chromosome* population, size_t pop_len, unsigned int * seed) {
   assert(pop_len >= 2);
   size_t k = 2;
   size_t fittest = rand_r(seed) % (pop_len);
-  for(int i = 0; i < k ; i++){
+
+  // we use i = 1 becuase the fittest is already choosen
+  for(int i = 1; i < k ; i++){
     size_t candidate = rand_r(seed) % pop_len;
     if (population[candidate].fitness > population[fittest].fitness)
       fittest = candidate;

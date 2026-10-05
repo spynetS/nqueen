@@ -66,6 +66,7 @@ void print_chromosome(Chromosome state) {
 
 #ifdef ROULETTE
 size_t selection(Chromosome* population, size_t pop_len, unsigned int *seed) {
+  // roulette wheel selection
   int total_fitness = 0;
 
   for (size_t i = 0; i < pop_len; i++) {

@@ -1,3 +1,11 @@
+/*
+  === Authors ===
+  Alfred Roos, Stefan Strand, Oliver Fiala, Leo Modin
+
+  If ROULETTE is defined the roulette wheel selection method will be used instead of the tournament selection
+
+*/
+
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
@@ -8,6 +16,7 @@
 #include <pthread.h>
 
 #include "./nqueen.h"
+
 
 /* #ifndef */
 /* //#define ROULETTE */

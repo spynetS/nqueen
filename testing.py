@@ -15,10 +15,10 @@ def test(populations, mutations, file_name = ""):
 
 def bla():
     # test the tournament mutation
-    test([2], [1,5,10,20,40,60,80,100], "tournament-k2-mut-1-100.txt")
-    test([2], [60,80], "tournament-k2-mut-60-80.txt")
+    test([2], [1,5,10,20,40,60,80,100], "tournament-samep-k2-mut-1-100.txt")
+#    test([2], [60,80], "tournament-k2-mut-60-80.txt")
     # create the comparison
-    os.system("./nqueen 2 80")
+ #   os.system("./nqueen 2 80")
  #    os.system("make nqueen ROULETTE=-DROULETTE")
 #     os.system("./nqueen 2 60")
 #     shutil.copy("./data.txt", "tournament-vs-roulette.txt")

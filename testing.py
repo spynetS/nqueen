@@ -1,3 +1,7 @@
+#  === Authors ===
+#  Alfred Roos, Stefan Strand, Oliver Fiala, Leo Modin
+
+
 import os
 import shutil
 

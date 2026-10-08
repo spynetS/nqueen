@@ -140,7 +140,7 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
     used[i] = false;
   }
 
-  // copy the first half from parent 1x
+  // copy the first random half from parent 1x
   int pos = 0;
   int split = rand_r(seed) % (n - 1) + 1;
   for (int i = 0; i < split; i ++) {
@@ -165,8 +165,6 @@ Chromosome crossover(Chromosome parent1, Chromosome parent2, float mutation_rate
   
   return child;
 }
-
-
 
 int nqueen(Config config) {
   assert(config.n >= 4);

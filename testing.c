@@ -1,3 +1,7 @@
+//  === Authors ===
+//  Alfred Roos, Stefan Strand, Oliver Fiala, Leo Modin
+
+
 #include "nqueen.h"
 #include <time.h>
 #include <stdio.h>

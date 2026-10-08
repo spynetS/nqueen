@@ -1,3 +1,5 @@
+//  === Authors ===
+//  Alfred Roos, Stefan Strand, Oliver Fiala, Leo Modin
 #ifndef NQUEEN_H
 #define NQUEEN_H
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+#  === Authors ===
+#  Alfred Roos, Stefan Strand, Oliver Fiala, Leo Modin
 
 import sys
 import matplotlib.pyplot as plt

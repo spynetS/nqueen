@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 #  === Authors ===
 #  Alfred Roos, Stefan Strand, Oliver Fiala, Leo Modin
@@ -25,7 +26,9 @@ def read_data(filename):
 
             # Header -> label for the next run
             try:
-                x, mean, std, success_rate = map(float, line.split())
+                x, mean, std, success_rate, mean_time = map(
+                    float, line.split()
+                )
             except ValueError:
                 # Finish previous run if necessary
                 if current_line:
@@ -40,7 +43,9 @@ def read_data(filename):
                 lines.append((current_label, current_line))
                 current_line = []
 
-            current_line.append((x, mean, std, success_rate))
+            current_line.append(
+                (x, mean, std, success_rate, mean_time)
+            )
 
     if current_line:
         lines.append((current_label, current_line))
@@ -48,13 +53,17 @@ def read_data(filename):
     return lines
 
 
+
 def plot_data(filename, output=None):
     lines = read_data(filename)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    # Three plots in one window
+    fig, (ax1, ax2, ax3) = plt.subplots(
+        1, 3, figsize=(18, 5)
+    )
 
     # -------------------------------------------------
-    # Plot 1: Mean + standard deviation
+    # Plot 1: Mean generations + standard deviation
     # -------------------------------------------------
 
     for label, line in lines:
@@ -82,12 +91,7 @@ def plot_data(filename, output=None):
         x = [point[0] for point in line]
         success_rate = [point[3] for point in line]
 
-        ax2.plot(
-            x,
-            success_rate,
-            marker="o",
-            label=label
-        )
+        ax2.plot(x, success_rate, marker="o", label=label)
 
     ax2.set_xlabel("Number of Queens")
     ax2.set_ylabel("Success Rate (%)")
@@ -95,6 +99,22 @@ def plot_data(filename, output=None):
     ax2.set_ylim(0, 100)
     ax2.grid(True)
     ax2.legend()
+
+    # -------------------------------------------------
+    # Plot 3: Mean execution time
+    # -------------------------------------------------
+
+    for label, line in lines:
+        x = [point[0] for point in line]
+        mean_time = [point[4] for point in line]
+
+        ax3.plot(x, mean_time, marker="o", label=label)
+
+    ax3.set_xlabel("Number of Queens")
+    ax3.set_ylabel("Mean Execution Time (seconds)")
+    ax3.set_title("Execution Time")
+    ax3.grid(True)
+    ax3.legend()
 
     fig.suptitle("N-Queens Genetic Algorithm")
     fig.tight_layout()
@@ -105,7 +125,8 @@ def plot_data(filename, output=None):
     else:
         plt.show()
 
-    plt.close()
+    plt.close(fig)
+
 
 
 if __name__ == "__main__":

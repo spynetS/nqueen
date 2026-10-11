@@ -1,7 +1,7 @@
 //  === Authors ===
 //  Alfred Roos, Stefan Strand, Oliver Fiala, Leo Modin
 
-
+#include <time.h>
 #include "nqueen.h"
 #include <time.h>
 #include <stdio.h>
@@ -13,7 +13,7 @@
 #define THREADS 24
 #endif
 #ifndef ROUNDS
-#define ROUNDS 50
+#define ROUNDS 5
 #endif
 #ifndef START_N
 #define START_N 8
@@ -30,7 +30,8 @@ typedef struct {
   int median;
   double stdev;
   double success_rate;
-  
+
+  double mean_time;
 } Result;
 
 typedef struct {
@@ -53,8 +54,19 @@ Result get_rounds_sum(Config config, int rounds) {
   int times_c = 0;
   
   for (size_t i = 0; i < rounds; i ++) {
+
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
     int generations = nqueen(config);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double elapsed =
+      (end.tv_sec - start.tv_sec) +
+      (end.tv_nsec - start.tv_nsec) / 1e9;
+
     if (generations != MAX_GENERATIONS) {
+      res.mean_time += elapsed;
       res.success_rate += 1;
       res.mean += generations;
       times[times_c++] = generations;
@@ -63,6 +75,7 @@ Result get_rounds_sum(Config config, int rounds) {
 
   res.success_rate /= rounds;
   if (times_c > 0) {
+    res.mean_time /= times_c;
     res.mean /= times_c;
     double stdev_sum = 0;
     for (size_t i = 0; i < times_c; i ++) {
@@ -144,7 +157,7 @@ int main(int argc, char** argv) {
   }
 
   for (int i = work_start; i < work_end; i++) {
-    fprintf(file, "%d %d %f %d\n",i, results[i].mean, results[i].stdev, (int)(results[i].success_rate*100));
+    fprintf(file, "%d %d %f %d %f\n",i, results[i].mean, results[i].stdev, (int)(results[i].success_rate*100), results[i].mean_time);
   }
 
   fclose(file);

@@ -13,7 +13,7 @@
 #define THREADS 24
 #endif
 #ifndef ROUNDS
-#define ROUNDS 5
+#define ROUNDS 50
 #endif
 #ifndef START_N
 #define START_N 8
@@ -24,6 +24,8 @@
 
 int pop_mod = 5;
 int mut_percent = 5;
+
+int selection = 0;
 
 typedef struct {
   int mean;
@@ -65,8 +67,8 @@ Result get_rounds_sum(Config config, int rounds) {
       (end.tv_sec - start.tv_sec) +
       (end.tv_nsec - start.tv_nsec) / 1e9;
 
+		res.mean_time += elapsed;
     if (generations != MAX_GENERATIONS) {
-      res.mean_time += elapsed;
       res.success_rate += 1;
       res.mean += generations;
       times[times_c++] = generations;
@@ -98,6 +100,7 @@ void *worker(void *arg_) {
     config.n = (i);
     config.pop_len = config.n * pop_mod;
     config.mutation_rate = (float)mut_percent/100;
+		config.selection = selection;
 
     unsigned int seed = (unsigned int)time(NULL) ^ (unsigned int)pthread_self();
     config.random_seed = &seed;
@@ -120,6 +123,11 @@ int main(int argc, char** argv) {
   if (argc >= 3) {
     mut_percent = atoi(argv[2]);
   }
+
+	if (argc >= 4) {
+    selection = atoi(argv[3]);
+  }
+
 
 
   srand(time(NULL));

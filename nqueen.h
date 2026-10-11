@@ -12,6 +12,7 @@ typedef struct {
   int pop_len;
   float mutation_rate;
   unsigned int* random_seed;
+	int selection; // 0: tournament k = 2, 1: tournament k = p / 2, 2: roulettewheel 
 } Config;
 
 // list of floatsn

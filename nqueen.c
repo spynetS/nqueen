@@ -18,9 +18,6 @@
 #include "./nqueen.h"
 
 
-/* #ifndef */
-/* //#define ROULETTE */
-/* #endif */
 Chromosome get_rand_r_state(size_t n, unsigned int* seed) {
   Chromosome state;
   state.pos = malloc(sizeof(int) * n);
@@ -73,8 +70,8 @@ void print_chromosome(Chromosome state) {
   printf("\nfitness %d\n", fitness(state));
 }
 
-#ifdef ROULETTE
-size_t selection(Chromosome* population, size_t pop_len, unsigned int *seed) {
+
+size_t roulette_selection(Chromosome* population, size_t pop_len, unsigned int *seed) {
   // roulette wheel selection
   int total_fitness = 0;
 
@@ -95,11 +92,10 @@ size_t selection(Chromosome* population, size_t pop_len, unsigned int *seed) {
 
   return pop_len - 1;
 }
-#else
-size_t selection(Chromosome* population, size_t pop_len, unsigned int * seed) {
+
+size_t tournament_selection(Chromosome* population, size_t pop_len, unsigned int * seed, size_t k) {
   // Tournament selection
   assert(pop_len >= 2);
-  size_t k = 2;
   size_t fittest = rand_r(seed) % (pop_len);
 
   // we use i = 1 becuase the fittest is already choosen
@@ -111,7 +107,6 @@ size_t selection(Chromosome* population, size_t pop_len, unsigned int * seed) {
 
   return fittest;
 }
-#endif
 
 void mutate(Chromosome *child, unsigned int* seed) {
   int i = rand_r(seed) % child->size;
@@ -186,8 +181,24 @@ int nqueen(Config config) {
     for (int j = 0; j < config.pop_len; j ++) {
 
       // pick randomly the parents from the parents array
-      size_t parent1 = selection(population, config.pop_len, config.random_seed);
-      size_t parent2 = selection(population, config.pop_len, config.random_seed);
+      size_t parent1 = 0;
+      size_t parent2 = 0;
+
+			switch(config.selection){
+			case 0:
+				parent1 = tournament_selection(population, config.pop_len, config.random_seed,2);
+				parent2 = tournament_selection(population, config.pop_len, config.random_seed,2);
+				break;
+			case 1:
+				parent1 = tournament_selection(population, config.pop_len, config.random_seed, config.pop_len/2);
+				parent2 = tournament_selection(population, config.pop_len, config.random_seed, config.pop_len/2);
+				break;
+			case 2:
+				parent1 = roulette_selection(population, config.pop_len, config.random_seed);
+				parent2 = roulette_selection(population, config.pop_len, config.random_seed);
+				break;
+
+			}
 
       child = crossover(population[parent1], population[parent2], config.mutation_rate, config.random_seed);
       
